@@ -1,5 +1,3 @@
-Claro! Aqui está uma ideia de como você pode estruturar o seu arquivo `README.md` para o seu bot de WhatsApp. O objetivo do `README` é fornecer informações claras sobre o projeto, como configurá-lo, usá-lo, e outras informações úteis.
-
 # Minishai Bot
 
 **Minishai Bot** é um bot de WhatsApp desenvolvido com a biblioteca [Baileys](https://github.com/adiwajshing/Baileys), com funcionalidades personalizadas para automação em grupos de WhatsApp, como comandos para envio de mídias, controle de permissões e muito mais!
