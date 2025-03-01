@@ -12,7 +12,7 @@
 ## Requisitos
 
 - [Node.js](https://nodejs.org) (versão >= 14)
-- [Baileys](https://github.com/adiwajshing/Baileys)
+- [Baileys](https://github.com/WhiskeySockets/Baileys)
 - Dependências do projeto (instaladas com `npm install`)
 
 ## Instalação
@@ -72,20 +72,7 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 ## Agradecimentos
 
-- [Baileys](https://github.com/adiwajshing/Baileys) pela excelente biblioteca para WhatsApp.
+- [Baileys](https://github.com/WhiskeySockets/Baileys) pela excelente biblioteca para WhatsApp.
 - [Youtube-dl](https://github.com/ytdl-org/youtube-dl) para o download de vídeos e áudios.
 - [Snapinst API](https://www.snapinst.com) para o download de vídeos do Instagram.
 ```
-
-### Explicação de cada seção:
-
-- **Título e descrição**: Explica rapidamente o que o bot faz e qual a sua principal função.
-- **Funcionalidades**: Uma lista das principais funções do bot, destacando o que ele pode fazer.
-- **Requisitos**: O que é necessário para rodar o projeto (por exemplo, Node.js).
-- **Instalação**: Passo a passo para configurar o projeto e instalar as dependências.
-- **Comandos Disponíveis**: Uma lista de comandos que o bot aceita. Cada comando é explicado de forma resumida.
-- **Como Contribuir**: Passos para quem deseja contribuir para o projeto.
-- **Licença**: Se você decidir usar uma licença como MIT, GPL, etc.
-- **Agradecimentos**: Referências a bibliotecas ou ferramentas usadas no projeto.
-
-Esse `README.md` fornece uma boa visão geral e um guia completo para quem deseja usar ou contribuir com o seu bot. Se tiver mais informações para adicionar ou personalizar, fique à vontade! 😊
