@@ -20,6 +20,21 @@ const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 const Jimp = require('jimp');
 
 const blacklistPath = path.join(__dirname, '../src/json/blacklist.json');
+
+const dirPath = path.dirname(blacklistPath);
+if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true }); // Cria o diretório src/json
+}
+
+// Agora, cria o arquivo blacklist.json se não existir
+if (!fs.existsSync(blacklistPath)) {
+    fs.writeFileSync(blacklistPath, `{
+      "5598988023704": {
+        "motivo": "Espalhou spam"
+      }
+    }`);
+}
+
 const blacklist = JSON.parse(fs.readFileSync(blacklistPath, 'utf8'));
 
 const addToBlacklist = (numero, motivo) => {
@@ -335,6 +350,19 @@ await socket.sendMessage(sender, {
 
             } else if (textMessage.startsWith('#gemini ')) {
                 const vipsPath = path.join(__dirname, '../src/json/vips.json');
+
+                const dirPath = path.dirname(vipsPath);
+                if (!fs.existsSync(dirPath)) {
+                    fs.mkdirSync(dirPath, { recursive: true }); // Cria o diretório src/json
+                }
+
+                // Agora, cria o arquivo vips.json se não existir
+                if (!fs.existsSync(vipsPath)) {
+                    fs.writeFileSync(vipsPath, `[
+    "5511999999999",
+    "5598988023704"
+]`);
+                }
                 const vips = JSON.parse(fs.readFileSync(vipsPath));
                 const userNumber = message.key.remoteJid.split('@')[0];
 
