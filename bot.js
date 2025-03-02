@@ -12,27 +12,50 @@ const cors = require('cors');
 const apiRoutes = require('./api/youtube');
 const apiTiktok = require('./api/tiktok');
 const apiInstagram = require('./api/instagram');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const genAI = new GoogleGenerativeAI('AIzaSyBTbb6O8k1MCmYwFL0dkp5qelB__t83UPI');
+const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 const Jimp = require('jimp');
+
+const blacklistPath = path.join(__dirname, '../src/json/blacklist.json');
+const blacklist = JSON.parse(fs.readFileSync(blacklistPath, 'utf8'));
+
+const addToBlacklist = (numero, motivo) => {
+    if (blacklist[numero]) {
+      return '*❌ | Esse número já está na blacklist.*';
+    }
+  
+    blacklist[numero] = { motivo: motivo };
+    fs.writeFileSync('./blacklist.json', JSON.stringify(blacklist, null, 2));
+    return `*✅ | O número ${numero} foi adicionado à blacklist com o motivo: ${motivo}*`;
+};
+
+const checkBlacklist = (numero) => {
+    if (blacklist[numero]) {
+      return `*❌ | Você está na blacklist. Motivo: ${blacklist[numero].motivo}*`;
+    }
+    return null; // Não está na blacklist
+};
 
 // Função para verificar se o usuário é admin
 const isUserAdmin = (sender, groupMetadata) => {
     return groupMetadata.participants.some(
       (participant) => participant.id === sender && participant.isAdmin
     );
-  };
+};
   
-  // Função para verificar se o bot é admin
-  const isBotAdmin = (groupMetadata) => {
+// Função para verificar se o bot é admin
+const isBotAdmin = (groupMetadata) => {
     return groupMetadata.participants.some(
       (participant) => participant.id === socket.info.wid && participant.isAdmin
     );
-  };  
+};
 
 // Caminho da imagem local
 const imgLogoPath = path.join(__dirname, 'src', 'images', 'MiniShai.jpg');
 const imgIP = path.join(__dirname, 'src', 'images', 'ip-api.jpg');
-// Isso vai pegar a imagem MiniShai.jpg da raiz do projeto
 
 // Função para redimensionar a imagem
 const reSize = async (buffer, ukur1, ukur2) => {
@@ -45,33 +68,16 @@ const reSize = async (buffer, ukur1, ukur2) => {
   });
 };
 
-
-  const loadLogo = async () => {
+const loadLogo = async () => {
     try {
-      // Lendo a imagem localmente
       const buffer = fs.readFileSync(imgLogoPath);  // Lê o arquivo de imagem
       const logo = await reSize(buffer, 280, 200);  // Redimensiona a imagem
       return logo;  // Retorna a imagem redimensionada
     } catch (error) {
       console.error('Erro ao carregar ou redimensionar a logo:', error);
-      throw error;  // Lança o erro para ser tratado no código que chamar a função
+      throw error;
     }
-  };
-  
-  const loadLogoIP = async () => {
-    try {
-      // Lendo a imagem localmente
-      const buffer = fs.readFileSync(imgLogoPath);  // Lê o arquivo de imagem
-      const logo = await reSize(buffer, 280, 200);  // Redimensiona a imagem
-      return logo;  // Retorna a imagem redimensionada
-    } catch (error) {
-      console.error('Erro ao carregar ou redimensionar a logo:', error);
-      throw error;  // Lança o erro para ser tratado no código que chamar a função
-    }
-  };
-
-// const imglogo = "https://opedyboy.sirv.com/Menu/logo.jpg";
-// const logo = await reSize(imglogo, 280, 200);
+};
 
 let antiLinkEnabled = false;
 const cooldowns = new Map();
@@ -114,6 +120,13 @@ async function miniShai1() {
             if (!textMessage) return console.log('❌ | Mensagem sem texto.');
             
             const sender = message.key.remoteJid;
+            const blacklistMsg = checkBlacklist(sender);
+
+            if (blacklistMsg) {
+                // Responde o usuário com a mensagem de blacklist
+                return socket.sendMessage(message.key.remoteJid, { text: blacklistMsg });
+            }
+
             const command = textMessage.trim().toLowerCase();
 
             const quotedMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -319,6 +332,28 @@ await socket.sendMessage(sender, {
                         }
                     });
                 }                             
+
+            } else if (textMessage.startsWith('#gemini ')) {
+                const vipsPath = path.join(__dirname, '../src/json/vips.json');
+                const vips = JSON.parse(fs.readFileSync(vipsPath));
+                const userNumber = message.key.remoteJid.split('@')[0];
+
+                if (!vips.includes(userNumber)) {
+                    await socket.sendMessage(message.key.remoteJid, { text: '*❌ Apenas usuários VIPs podem usar este comando.*' });
+                    return;
+                }
+
+                const query = textMessage.slice(8).trim(); // Remove '#gemini ' e pega o resto
+                if (!query) {
+                  await socket.sendMessage(message.key.remoteJid, { text: '*⚠️ Por favor, forneça uma **query** após o comando.*' });
+                  return;
+                }
+
+                const result = await model.generateContent(query);
+
+                const response = result.response.text();
+
+                await socket.sendMessage(message.key.remoteJid, { text: `> ${response}` });
                 
             } else if (textMessage.startsWith('#tikmp4 ')) {
                 console.log('✅ Comando #tiktokmp4 detectado.');
